@@ -155,4 +155,70 @@
   // invoke theme check on initial load
   themeCheck();
   /* ========  themeSwitcher End ========= */
+
+  /* ========  Modern UI: 3D tilt on cards ========= */
+  const tiltTargets = document.querySelectorAll(
+    ".project-card, .card-3d, .contact-card, .cert-card"
+  );
+  const tiltStrength = 8; // degrees
+  tiltTargets.forEach((el) => {
+    el.style.transformStyle = "preserve-3d";
+    el.style.willChange = "transform";
+
+    el.addEventListener("mousemove", (e) => {
+      const rect = el.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      const rotY = (x - 0.5) * tiltStrength * 2;
+      const rotX = (0.5 - y) * tiltStrength * 2;
+      el.style.transform =
+        "perspective(1000px) rotateX(" +
+        rotX.toFixed(2) +
+        "deg) rotateY(" +
+        rotY.toFixed(2) +
+        "deg) translateY(-6px) scale(1.01)";
+    });
+
+    el.addEventListener("mouseleave", () => {
+      el.style.transform = "";
+    });
+  });
+
+  /* ========  Modern UI: Scroll reveal ========= */
+  const revealElements = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window && revealElements.length) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in-view");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    revealElements.forEach((el) => io.observe(el));
+  } else {
+    revealElements.forEach((el) => el.classList.add("in-view"));
+  }
+
+  /* ========  Modern UI: Subtle parallax for hero shapes ========= */
+  const heroShapes = document.querySelectorAll(".hero-shape");
+  if (heroShapes.length) {
+    window.addEventListener(
+      "mousemove",
+      (e) => {
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        const dx = (e.clientX - cx) / cx;
+        const dy = (e.clientY - cy) / cy;
+        heroShapes.forEach((s, i) => {
+          const depth = 10 + i * 6;
+          s.style.translate = (dx * depth).toFixed(1) + "px " + (dy * depth).toFixed(1) + "px";
+        });
+      },
+      { passive: true }
+    );
+  }
 })();
